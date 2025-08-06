@@ -25,14 +25,8 @@ FROM base as build
 COPY Gemfile Gemfile.lock ./
 RUN bundle install --jobs $(nproc) --retry 3
 
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
-
 # Copia el resto del código de la aplicación.
 COPY . .
-
-# Precompila los assets para producción.
-RUN RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 
 # --- Etapa 3: Production ---
 # Esta es la imagen final. Es ligera porque no incluye las herramientas de construcción.
