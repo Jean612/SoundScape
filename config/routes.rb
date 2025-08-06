@@ -4,6 +4,10 @@ Rails.application.routes.draw do
       # Test endpoint
       get 'test', to: 'test#index'
       
+      # TEMPORAL: Admin endpoints (eliminar después)
+      delete 'admin/users/:email', to: 'admin#delete_user'
+      get 'admin/users', to: 'admin#list_users'
+      
       # Authentication routes
       post 'auth/login', to: 'authentication#login'
       post 'auth/register', to: 'authentication#register'
