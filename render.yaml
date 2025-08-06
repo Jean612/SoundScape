@@ -39,10 +39,10 @@ services:
         value: soundscape.onrender.com
       # CORS Configuration
       - key: CORS_ALLOWED_ORIGINS
-        value: https://sound-scape-frontend.vercel.app,https://soundscape.onrender.com
+        value: https://soundscape-frontend-qzwqagdi9-jean612s-projects.vercel.app
       # Gemini AI API Key
       - key: GEMINI_API_KEY
         sync: false
-    buildCommand: bundle install && npm install && bundle exec rails assets:precompile
+    buildCommand: bundle install
     startCommand: bundle exec rails db:migrate && bundle exec puma -C config/puma.rb
     healthCheckPath: /up
