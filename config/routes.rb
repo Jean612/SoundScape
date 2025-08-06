@@ -18,6 +18,9 @@ Rails.application.routes.draw do
       post 'ai_search', to: 'ai_search#search'
       get 'ai_search/trending', to: 'ai_search#trending'
       get 'ai_search/history', to: 'ai_search#user_history'
+      
+      # AI Playlist routes - Add AI search results directly to playlists
+      post 'playlists/:playlist_id/add_ai_song', to: 'ai_playlist#add_song_from_ai'
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

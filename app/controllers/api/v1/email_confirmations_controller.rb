@@ -1,5 +1,5 @@
 class Api::V1::EmailConfirmationsController < ApplicationController
-  skip_before_action :authenticate_request, only: [ :confirm, :resend ]
+  skip_before_action :authenticate_request
 
   def confirm
     user = User.find_by(email_confirmation_token: params[:token])

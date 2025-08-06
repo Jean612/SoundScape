@@ -12,13 +12,8 @@ class AiSearchService
 
   def initialize(attributes = {})
     super
-    @client = Gemini.new(
-      credentials: {
-        service: "generative-language-api",
-        api_key: Rails.application.credentials.dig(:gemini, :api_key) || ENV["GEMINI_API_KEY"]
-      },
-      options: { model: "gemini-1.5-flash", server_sent_events: true }
-    )
+    @api_key = ENV["GEMINI_API_KEY"]
+    raise StandardError, "GEMINI_API_KEY not configured" if @api_key.blank?
   end
 
   def search_songs
@@ -103,17 +98,29 @@ class AiSearchService
 
   def generate_ai_suggestions
     prompt = build_search_prompt
-
-    response = @client.stream_generate_content({
-      contents: {
-        role: "user",
-        parts: { text: prompt }
-      }
-    })
-
-    full_response = ""
-    response.each { |chunk| full_response += chunk }
-    full_response
+    
+    conn = Faraday.new("https://generativelanguage.googleapis.com")
+    
+    response = conn.post("/v1beta/models/gemini-1.5-flash:generateContent") do |req|
+      req.params["key"] = @api_key
+      req.headers["Content-Type"] = "application/json"
+      req.body = {
+        contents: [{
+          parts: [{ text: prompt }]
+        }]
+      }.to_json
+    end
+    
+    if response.success?
+      result = JSON.parse(response.body)
+      result.dig("candidates", 0, "content", "parts", 0, "text") || ""
+    else
+      Rails.logger.error "Gemini API Error: #{response.status} - #{response.body}"
+      raise StandardError, "Gemini API request failed: #{response.status}"
+    end
+  rescue JSON::ParserError => e
+    Rails.logger.error "JSON Parse Error: #{e.message}"
+    raise StandardError, "Failed to parse Gemini response"
   rescue StandardError => e
     Rails.logger.error "Gemini API Error: #{e.message}"
     raise e
