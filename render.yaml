@@ -44,5 +44,5 @@ services:
       - key: GEMINI_API_KEY
         sync: false
     buildCommand: bundle install
-    startCommand: bundle exec rails db:migrate && bundle exec puma -C config/puma.rb
+    startCommand: ./bin/render-start.sh
     healthCheckPath: /up

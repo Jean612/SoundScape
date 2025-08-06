@@ -45,9 +45,9 @@ EXPOSE 3000
 RUN groupadd --gid 1000 rails \
   && useradd --uid 1000 --gid rails --shell /bin/bash --create-home rails
 
-# Cambia la propiedad de los archivos
-RUN chown -R rails:rails /rails
+# Cambia la propiedad de los archivos y hace el script ejecutable
+RUN chown -R rails:rails /rails && chmod +x /rails/bin/render-start.sh
 USER rails:rails
 
-# El comando para iniciar el servidor Puma en modo producción.
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+# El comando para iniciar el servidor (será override por render.yaml)
+CMD ["./bin/render-start.sh"]
