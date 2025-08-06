@@ -5,35 +5,52 @@
     <style>
       body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
       .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-      .header { background-color: #007bff; color: white; padding: 20px; text-align: center; }
+      .header { background-color: #22c55e; color: white; padding: 20px; text-align: center; }
       .content { padding: 20px; }
-      .button { display: inline-block; background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; margin: 20px 0; }
+      .otp-code { 
+        font-size: 36px; 
+        font-weight: bold; 
+        text-align: center; 
+        background-color: #f0fdf4; 
+        border: 2px solid #22c55e; 
+        padding: 20px; 
+        margin: 20px 0; 
+        border-radius: 8px; 
+        letter-spacing: 4px;
+        color: #16a34a;
+      }
+      .info-box { 
+        background-color: #fef3c7; 
+        border: 1px solid #f59e0b; 
+        padding: 15px; 
+        border-radius: 6px; 
+        margin: 20px 0; 
+      }
       .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 14px; color: #666; }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <h1>Welcome to SoundScape!</h1>
+        <h1>🎵 Welcome to SoundScape!</h1>
       </div>
       
       <div class="content">
         <h2>Hi <%= @user.name %>!</h2>
         
-        <p>Thanks for signing up for SoundScape. To complete your registration and start creating amazing playlists, please confirm your email address by clicking the button below:</p>
+        <p>Thanks for signing up for SoundScape! To complete your registration and start creating amazing playlists, please enter this verification code in the app:</p>
         
-        <p style="text-align: center;">
-          <a href="<%= @confirmation_url %>" class="button">Confirm My Email</a>
-        </p>
+        <div class="otp-code">
+          <%= @user.otp_code %>
+        </div>
         
-        <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
-        <p><%= @confirmation_url %></p>
-        
-        <p>This confirmation link will expire in 24 hours for security reasons.</p>
+        <div class="info-box">
+          <p><strong>⏰ Important:</strong> This code will expire in 15 minutes for security reasons.</p>
+        </div>
         
         <p>If you didn't create an account with SoundScape, please ignore this email.</p>
         
-        <p>Happy listening!<br>The SoundScape Team</p>
+        <p>Happy listening!<br>🎶 The SoundScape Team</p>
       </div>
       
       <div class="footer">

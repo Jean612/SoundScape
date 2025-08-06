@@ -1,16 +1,16 @@
-Welcome to SoundScape!
+🎵 Welcome to SoundScape!
 
 Hi <%= @user.name %>!
 
-Thanks for signing up for SoundScape. To complete your registration and start creating amazing playlists, please confirm your email address by visiting the following link:
+Thanks for signing up for SoundScape! To complete your registration and start creating amazing playlists, please enter this verification code in the app:
 
-<%= @confirmation_url %>
+VERIFICATION CODE: <%= @user.otp_code %>
 
-This confirmation link will expire in 24 hours for security reasons.
+⏰ Important: This code will expire in 15 minutes for security reasons.
 
 If you didn't create an account with SoundScape, please ignore this email.
 
 Happy listening!
-The SoundScape Team
+🎶 The SoundScape Team
 
 © 2025 SoundScape. All rights reserved.

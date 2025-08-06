@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_05_061431) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_06_161738) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -78,6 +78,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_061431) do
     t.boolean "email_confirmed", default: false, null: false
     t.string "email_confirmation_token"
     t.datetime "email_confirmation_sent_at"
+    t.string "otp_code"
+    t.datetime "otp_expires_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["email_confirmation_token"], name: "index_users_on_email_confirmation_token", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true

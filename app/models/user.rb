@@ -35,10 +35,12 @@ class User < ApplicationRecord
   validates :country, presence: true
   validates :birth_date, presence: true
 
-  before_create :generate_email_confirmation_token
+  before_create :generate_otp_code
   after_create :send_email_confirmation
 
-  def generate_email_confirmation_token
+  def generate_otp_code
+    self.otp_code = sprintf('%06d', SecureRandom.random_number(1_000_000))
+    self.otp_expires_at = 15.minutes.from_now
     self.email_confirmation_token = SecureRandom.urlsafe_base64
     self.email_confirmation_sent_at = Time.current
   end
@@ -47,16 +49,44 @@ class User < ApplicationRecord
     UserMailer.email_confirmation(self).deliver_now
   end
 
+  def verify_otp(code)
+    return false if otp_expired?
+    return false if otp_code != code
+    
+    confirm_email!
+    true
+  end
+
   def confirm_email!
-    update!(email_confirmed: true, email_confirmation_token: nil)
+    update!(
+      email_confirmed: true, 
+      email_confirmation_token: nil,
+      otp_code: nil,
+      otp_expires_at: nil
+    )
   end
 
   def email_confirmed?
     email_confirmed
   end
 
+  def otp_expired?
+    otp_expires_at.nil? || otp_expires_at < Time.current
+  end
+
   def email_confirmation_expired?
     email_confirmation_sent_at < 24.hours.ago
+  end
+
+  def resend_otp_code
+    generate_otp_code
+    save!
+    send_email_confirmation
+  end
+
+  def generate_email_confirmation_token
+    self.email_confirmation_token = SecureRandom.urlsafe_base64
+    self.email_confirmation_sent_at = Time.current
   end
 
   def resend_email_confirmation

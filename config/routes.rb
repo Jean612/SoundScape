@@ -4,6 +4,8 @@ Rails.application.routes.draw do
       # Authentication routes
       post 'auth/login', to: 'authentication#login'
       post 'auth/register', to: 'authentication#register'
+      post 'auth/verify_otp', to: 'email_confirmations#verify_otp'
+      post 'auth/resend_otp', to: 'email_confirmations#resend_otp'
       get 'auth/confirm_email', to: 'email_confirmations#confirm'
       post 'auth/resend_confirmation', to: 'email_confirmations#resend'
       
