@@ -1,0 +1,48 @@
+databases:
+  - name: soundscape-postgres
+    databaseName: soundscape_production
+    user: soundscape
+
+services:
+  - type: web
+    name: soundscape-api
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: soundscape-postgres
+          property: connectionString
+      - key: RAILS_ENV
+        value: production
+      - key: RAILS_SERVE_STATIC_FILES
+        value: enabled
+      - key: RAILS_LOG_TO_STDOUT
+        value: enabled
+      - key: SECRET_KEY_BASE
+        generateValue: true
+      - key: RAILS_MASTER_KEY
+        sync: false
+      # SMTP Configuration for email
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USERNAME
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_DOMAIN
+        value: soundscape.onrender.com
+      # CORS Configuration
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://sound-scape-frontend.vercel.app,https://soundscape.onrender.com
+      # Gemini AI API Key
+      - key: GEMINI_API_KEY
+        sync: false
+    buildCommand: bundle install && npm install && bundle exec rails assets:precompile
+    startCommand: bundle exec rails db:migrate && bundle exec puma -C config/puma.rb
+    healthCheckPath: /up
