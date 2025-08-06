@@ -7,8 +7,8 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    # Allow all origins in development
     if Rails.env.development?
+      # Allow all origins in development only
       origins '*'
       resource '*',
         headers: :any,
@@ -16,11 +16,16 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
         expose: ['Authorization'],
         credentials: true
     else
-      # In production, specify your frontend domains
-      origins ENV['CORS_ALLOWED_ORIGINS']&.split(',') || [
-        'https://sound-scape-frontend.vercel.app',
-        'https://soundscape-frontend.vercel.app'
-      ]
+      # Production: Use environment variable or safe defaults
+      allowed_origins = if ENV['CORS_ALLOWED_ORIGINS'].present?
+        ENV['CORS_ALLOWED_ORIGINS'].split(',').map(&:strip)
+      else
+        [
+          'https://soundscape-frontend-qzwqagdi9-jean612s-projects.vercel.app'
+        ]
+      end
+
+      origins allowed_origins
       resource '*',
         headers: :any,
         methods: [:get, :post, :put, :patch, :delete, :options, :head],
