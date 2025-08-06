@@ -76,8 +76,9 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
-  # Disable host authorization completely for debugging
-  config.host_authorization = { exclude: ->(request) { true } }
+  # Completely disable all host checks
+  config.hosts = nil
+  config.host_authorization = nil
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }

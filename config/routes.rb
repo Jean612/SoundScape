@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
+      # Test endpoint
+      get 'test', to: 'test#index'
+      
       # Authentication routes
       post 'auth/login', to: 'authentication#login'
       post 'auth/register', to: 'authentication#register'
