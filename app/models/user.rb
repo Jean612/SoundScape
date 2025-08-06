@@ -2,7 +2,7 @@
 #
 # Table name: users
 #
-#  id                           :integer          not null, primary key
+#  id                           :bigint           not null, primary key
 #  email                        :string
 #  password_digest              :string
 #  google_id                    :string
@@ -15,6 +15,8 @@
 #  email_confirmed              :boolean          default(FALSE), not null
 #  email_confirmation_token     :string
 #  email_confirmation_sent_at   :datetime
+#  otp_code                     :string
+#  otp_expires_at               :datetime
 #
 # Indexes
 #
