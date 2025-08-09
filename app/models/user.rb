@@ -77,7 +77,7 @@ class User < ApplicationRecord
   end
 
   def email_confirmation_expired?
-    email_confirmation_sent_at < 24.hours.ago
+    email_confirmation_sent_at.nil? || email_confirmation_sent_at < 24.hours.ago
   end
 
   def resend_otp_code

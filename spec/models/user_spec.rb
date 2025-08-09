@@ -54,4 +54,21 @@ RSpec.describe User, type: :model do
       expect(user).to be_valid
     end
   end
+
+  describe '#email_confirmation_expired?' do
+    it 'returns true when no confirmation has been sent' do
+      user = build(:user, email_confirmation_sent_at: nil)
+      expect(user.email_confirmation_expired?).to be true
+    end
+
+    it 'returns true when confirmation was sent more than 24 hours ago' do
+      user = build(:user, email_confirmation_sent_at: 25.hours.ago)
+      expect(user.email_confirmation_expired?).to be true
+    end
+
+    it 'returns false when confirmation was sent within the last 24 hours' do
+      user = build(:user, email_confirmation_sent_at: 1.hour.ago)
+      expect(user.email_confirmation_expired?).to be false
+    end
+  end
 end
