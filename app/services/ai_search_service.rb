@@ -12,8 +12,8 @@ class AiSearchService
 
   def initialize(attributes = {})
     super
-    @api_key = ENV["GEMINI_API_KEY"]
-    raise StandardError, "GEMINI_API_KEY not configured" if @api_key.blank?
+    @api_key = ENV["OPENAI_API_KEY"]
+    raise StandardError, "OPENAI_API_KEY not configured" if @api_key.blank?
   end
 
   def search_songs
@@ -98,31 +98,20 @@ class AiSearchService
 
   def generate_ai_suggestions
     prompt = build_search_prompt
-    
-    conn = Faraday.new("https://generativelanguage.googleapis.com")
-    
-    response = conn.post("/v1beta/models/gemini-1.5-flash:generateContent") do |req|
-      req.params["key"] = @api_key
-      req.headers["Content-Type"] = "application/json"
-      req.body = {
-        contents: [{
-          parts: [{ text: prompt }]
-        }]
-      }.to_json
-    end
-    
-    if response.success?
-      result = JSON.parse(response.body)
-      result.dig("candidates", 0, "content", "parts", 0, "text") || ""
-    else
-      Rails.logger.error "Gemini API Error: #{response.status} - #{response.body}"
-      raise StandardError, "Gemini API request failed: #{response.status}"
-    end
-  rescue JSON::ParserError => e
-    Rails.logger.error "JSON Parse Error: #{e.message}"
-    raise StandardError, "Failed to parse Gemini response"
+
+    client = OpenAI::Client.new(access_token: @api_key)
+    response = client.chat(
+      parameters: {
+        model: ENV.fetch("OPENAI_MODEL", "gpt-3.5-turbo"),
+        messages: [
+          { role: "user", content: prompt }
+        ]
+      }
+    )
+
+    response.dig("choices", 0, "message", "content") || ""
   rescue StandardError => e
-    Rails.logger.error "Gemini API Error: #{e.message}"
+    Rails.logger.error "OpenAI API Error: #{e.message}"
     raise e
   end
 

@@ -40,8 +40,8 @@ services:
       # CORS Configuration
       - key: CORS_ALLOWED_ORIGINS
         value: https://soundscape-frontend-qzwqagdi9-jean612s-projects.vercel.app
-      # Gemini AI API Key
-      - key: GEMINI_API_KEY
+      # OpenAI API Key
+      - key: OPENAI_API_KEY
         sync: false
     buildCommand: bundle install
     startCommand: ./bin/render-start.sh

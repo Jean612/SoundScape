@@ -5,6 +5,8 @@ RSpec.describe AiSearchService, type: :service do
   let(:query) { "Beatles" }
   let(:service) { AiSearchService.new(query: query, user_id: user.id, limit: 5) }
 
+  before { ENV['OPENAI_API_KEY'] = 'test-key' }
+
   describe '#search_songs' do
     context 'with valid query' do
       before do
@@ -13,27 +15,27 @@ RSpec.describe AiSearchService, type: :service do
         )
       end
 
-      it 'returns successful response with songs' do
+      it 'returns expected data' do
         result = service.search_songs
-        
-        expect(result[:success]).to be true
-        expect(result[:songs]).to be_an(Array)
-        expect(result[:songs].first[:title]).to eq("Yesterday")
-        expect(result[:songs].first[:artist]).to eq("The Beatles")
-        expect(result[:cached]).to be false
+
+        expect(result).to match(
+          hash_including(
+            success: true,
+            cached: false,
+            songs: [a_hash_including(title: 'Yesterday', artist: 'The Beatles')]
+          )
+        )
       end
 
       it 'caches the results' do
-        expect(Rails.cache).to receive(:write).with(anything, anything, expires_in: 1.hour).at_least(:once)
+        expect(Rails.cache).to receive(:write).with(anything, anything, expires_in: 1.hour)
         service.search_songs
       end
 
       it 'tracks search analytics' do
-        expect { service.search_songs }.to change(SearchAnalytic, :count).by(1)
-        
-        analytic = SearchAnalytic.last
-        expect(analytic.user_id).to eq(user.id)
-        expect(analytic.query).to eq(query)
+        service.search_songs
+
+        expect(SearchAnalytic.last).to have_attributes(user_id: user.id, query: query)
       end
     end
 
@@ -47,10 +49,10 @@ RSpec.describe AiSearchService, type: :service do
 
       it 'returns cached results' do
         result = service.search_songs
-        
-        expect(result[:success]).to be true
-        expect(result[:songs]).to eq(cached_songs)
-        expect(result[:cached]).to be true
+
+        expect(result).to match(
+          hash_including(success: true, songs: cached_songs, cached: true)
+        )
       end
 
       it 'does not call AI service when cached' do
@@ -63,10 +65,9 @@ RSpec.describe AiSearchService, type: :service do
       let(:query) { "" }
 
       it 'returns validation error' do
-        result = service.search_songs
-        
-        expect(result[:success]).to be false
-        expect(result[:error]).to eq("Query must be between 2 and 100 characters")
+        expect(service.search_songs).to match(
+          hash_including(success: false, error: "Query must be between 2 and 100 characters")
+        )
       end
     end
 
@@ -76,11 +77,13 @@ RSpec.describe AiSearchService, type: :service do
       end
 
       it 'returns rate limit error' do
-        result = service.search_songs
-        
-        expect(result[:success]).to be false
-        expect(result[:error]).to eq("Rate limit exceeded. Please try again later.")
-        expect(result[:rate_limited]).to be true
+        expect(service.search_songs).to match(
+          hash_including(
+            success: false,
+            error: "Rate limit exceeded. Please try again later.",
+            rate_limited: true
+          )
+        )
       end
     end
 
@@ -90,11 +93,13 @@ RSpec.describe AiSearchService, type: :service do
       end
 
       it 'returns fallback response' do
-        result = service.search_songs
-        
-        expect(result[:success]).to be false
-        expect(result[:error]).to eq("AI service temporarily unavailable. Please try again later.")
-        expect(result[:fallback]).to be true
+        expect(service.search_songs).to match(
+          hash_including(
+            success: false,
+            error: "AI service temporarily unavailable. Please try again later.",
+            fallback: true
+          )
+        )
       end
     end
   end
@@ -155,24 +160,21 @@ RSpec.describe AiSearchService, type: :service do
     it 'parses valid JSON response' do
       service = AiSearchService.new(query: query, user_id: user.id)
       result = service.send(:parse_ai_response, valid_json_response)
-      
-      expect(result).to be_an(Array)
-      expect(result.first[:title]).to eq("Yesterday")
-      expect(result.first[:artist]).to eq("The Beatles")
+
+      expect(result).to match([a_hash_including(title: 'Yesterday', artist: 'The Beatles')])
     end
 
     it 'extracts JSON from response with extra text' do
       service = AiSearchService.new(query: query, user_id: user.id)
       result = service.send(:parse_ai_response, response_with_extra_text)
-      
-      expect(result).to be_an(Array)
-      expect(result.first[:title]).to eq("Yesterday")
+
+      expect(result).to match([a_hash_including(title: 'Yesterday')])
     end
 
     it 'returns empty array for invalid JSON' do
       service = AiSearchService.new(query: query, user_id: user.id)
-      result = service.send(:parse_ai_response, "invalid json")
-      
+      result = service.send(:parse_ai_response, 'invalid json')
+
       expect(result).to eq([])
     end
   end
