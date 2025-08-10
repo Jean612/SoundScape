@@ -6,9 +6,9 @@ SoundScape es una API REST construida con Ruby on Rails que permite a los usuari
 
 - **Autenticación JWT** con confirmación de email obligatoria
 - **Gestión de Playlists** y canciones con autorización basada en roles
-- **Búsqueda Inteligente con IA** usando Google Gemini para sugerencias de canciones
-- **Sistema de Analytics** para tracking de búsquedas y tendencias
-- **Cache Inteligente** y rate limiting para optimización de rendimiento
+- **Búsqueda Potenciada con IA** usando OpenAI ChatGPT para sugerencias de canciones
+- **Sistema de análisis** para seguimiento de búsquedas y tendencias
+- **Cache Inteligente** y limitación de tasa para optimización de rendimiento
 - **Exportación** a Spotify/YouTube Music (próximamente)
 
 ## 🛠 Tecnologías
@@ -18,7 +18,7 @@ SoundScape es una API REST construida con Ruby on Rails que permite a los usuari
 - **PostgreSQL** como base de datos
 - **JWT** para autenticación
 - **CanCanCan** para autorización
-- **Google Gemini AI** para búsqueda inteligente
+- **OpenAI ChatGPT** para búsquedas con IA
 - **RSpec** para testing
 - **RuboCop** para formateo de código
 
@@ -26,8 +26,8 @@ SoundScape es una API REST construida con Ruby on Rails que permite a los usuari
 
 - Ruby 3.2.2+
 - PostgreSQL 12+
-- Redis (para cache y rate limiting)
-- Gemini API Key de Google
+- Redis (para cache y limitación de tasa)
+- Clave API de OpenAI
 
 ## ⚙️ Configuración
 
@@ -51,28 +51,28 @@ rails db:migrate
 Crear archivo `.env` basado en `.env.example`:
 
 ```bash
-# Database Configuration
+# Configuración de Base de Datos
 DATABASE_URL=postgresql://username:password@localhost/soundscape_development
 
-# Email Configuration  
+# Configuración de Correo
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USERNAME=your-email@gmail.com
 SMTP_PASSWORD=your-app-password
 SMTP_DOMAIN=soundscape.com
 
-# AI Configuration
-GEMINI_API_KEY=your-gemini-api-key-here
+# Configuración de IA
+OPENAI_API_KEY=your-openai-api-key-here
 
-# Redis Configuration (for caching and rate limiting)
+# Configuración de Redis (para cache y limitación de tasa)
 REDIS_URL=redis://localhost:6379/0
 ```
 
-### 3. Obtener Gemini API Key
+### 3. Obtener la API Key de OpenAI
 
-1. Visita [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Crea una nueva API key
-3. Agrega la key a tu archivo `.env`
+1. Visita [OpenAI Platform](https://platform.openai.com/account/api-keys)
+2. Crea una nueva clave API
+3. Agrega la clave a tu archivo `.env`
 
 ## 🚀 Uso
 
@@ -177,32 +177,32 @@ Actualmente tenemos **107+ tests pasando** con cobertura completa de:
 - Modelos y validaciones
 - Controladores y autenticación
 - Servicios de IA y cache
-- Analytics y rate limiting
+- Análisis y limitación de tasa
 
 ## 📊 Funcionalidades de IA
 
 ### Búsqueda Inteligente
 
-El sistema utiliza **Google Gemini 1.5 Flash** para generar sugerencias inteligentes de canciones:
+El sistema usa **OpenAI ChatGPT** para generar sugerencias de canciones:
 
 - **Cache**: Resultados cacheados por 1 hora para mejor rendimiento
-- **Rate Limiting**: 60 búsquedas por hora por usuario
+- **Limitación de tasa**: 60 búsquedas por hora por usuario
 - **Validación**: Queries entre 2-100 caracteres
-- **Fallback**: Respuesta graceful cuando la IA no está disponible
+- **Respuesta alternativa**: Respuesta de emergencia cuando la IA no está disponible
 
-### Analytics y Tendencias
+### Análisis y Tendencias
 
-- **Tracking de búsquedas**: Registra consultas, timestamps y resultados
-- **Búsquedas trending**: Top consultas en períodos configurables
+- **Seguimiento de búsquedas**: Registra consultas, timestamps y resultados
+- **Búsquedas en tendencia**: Top consultas en períodos configurables
 - **Historial personal**: Búsquedas paginadas por usuario
-- **Datos anónimos**: IP addresses para analytics sin identificación personal
+- **Datos anónimos**: Direcciones IP para análisis sin identificación personal
 
 ## 🔒 Seguridad
 
-- **JWT Authentication** con tokens seguros
-- **Email confirmation** obligatoria antes del acceso
-- **Rate limiting** por usuario y endpoint
-- **Authorization** basada en roles con CanCanCan
+- **Autenticación JWT** con tokens seguros
+- **Confirmación de email** obligatoria antes del acceso
+- **Limitación de tasa** por usuario y endpoint
+- **Autorización** basada en roles con CanCanCan
 - **Validación** exhaustiva de inputs
 - **Logs seguros** sin exposición de datos sensibles
 
@@ -228,7 +228,7 @@ docker-compose up -d
 - [ ] Sistema de recomendaciones personalizado
 - [ ] Compartir playlists entre usuarios
 - [ ] API de exportación masiva
-- [ ] Dashboard de analytics
+- [ ] Dashboard de análisis
 - [ ] Mobile SDK
 
 ## 🤝 Contribución

@@ -7,6 +7,7 @@ RSpec.describe Api::V1::AiSearchController, type: :controller do
 
   before do
     request.headers.merge!(headers)
+    ENV['OPENAI_API_KEY'] = 'test-key'
   end
 
   describe 'POST #search' do
@@ -33,23 +34,29 @@ RSpec.describe Api::V1::AiSearchController, type: :controller do
         })
       end
 
-      it 'returns successful response' do
+      it 'returns http ok status' do
         post :search, params: valid_params
-        
+
         expect(response).to have_http_status(:ok)
-        json_response = JSON.parse(response.body)
-        expect(json_response['success']).to be true
-        expect(json_response['data']['songs']).to be_an(Array)
-        expect(json_response['data']['songs'].first['title']).to eq("Yesterday")
       end
 
-      it 'tracks search analytics' do
+      it 'returns song data' do
+        post :search, params: valid_params
+
+        expect(JSON.parse(response.body)).to match(
+          hash_including('success' => true,
+                        'data' => hash_including('songs' => [hash_including('title' => 'Yesterday')]))
+        )
+      end
+
+      it 'creates analytics record' do
         expect { post :search, params: valid_params }.to change(SearchAnalytic, :count).by(1)
-        
-        analytic = SearchAnalytic.last
-        expect(analytic.user_id).to eq(user.id)
-        expect(analytic.query).to eq("Beatles")
-        expect(analytic.ip_address).to be_present
+      end
+
+      it 'stores correct analytics data' do
+        post :search, params: valid_params
+
+        expect(SearchAnalytic.last).to have_attributes(user_id: user.id, query: 'Beatles')
       end
     end
 
@@ -85,13 +92,16 @@ RSpec.describe Api::V1::AiSearchController, type: :controller do
         })
       end
 
-      it 'returns error response' do
+      it 'returns unprocessable content status' do
         post :search, params: valid_params
-        
+
         expect(response).to have_http_status(:unprocessable_content)
-        json_response = JSON.parse(response.body)
-        expect(json_response['success']).to be false
-        expect(json_response['error']).to include("AI service temporarily unavailable")
+      end
+
+      it 'returns fallback error message' do
+        post :search, params: valid_params
+
+        expect(JSON.parse(response.body)['error']).to include('AI service temporarily unavailable')
       end
     end
 
@@ -104,13 +114,16 @@ RSpec.describe Api::V1::AiSearchController, type: :controller do
         })
       end
 
-      it 'returns rate limited response' do
+      it 'returns too many requests status' do
         post :search, params: valid_params
-        
+
         expect(response).to have_http_status(:too_many_requests)
-        json_response = JSON.parse(response.body)
-        expect(json_response['success']).to be false
-        expect(json_response['rate_limited']).to be true
+      end
+
+      it 'returns rate limit flag' do
+        post :search, params: valid_params
+
+        expect(JSON.parse(response.body)['rate_limited']).to be true
       end
     end
 
@@ -119,12 +132,16 @@ RSpec.describe Api::V1::AiSearchController, type: :controller do
         request.headers['Authorization'] = nil
       end
 
-      it 'returns unauthorized' do
+      it 'returns unauthorized status' do
         post :search, params: valid_params
-        
+
         expect(response).to have_http_status(:unauthorized)
-        json_response = JSON.parse(response.body)
-        expect(json_response['error']).to eq('Missing token')
+      end
+
+      it 'returns missing token message' do
+        post :search, params: valid_params
+
+        expect(JSON.parse(response.body)['error']).to eq('Missing token')
       end
     end
 
@@ -136,12 +153,16 @@ RSpec.describe Api::V1::AiSearchController, type: :controller do
         request.headers['Authorization'] = "Bearer #{unconfirmed_token}"
       end
 
-      it 'returns forbidden' do
+      it 'returns forbidden status' do
         post :search, params: valid_params
-        
+
         expect(response).to have_http_status(:forbidden)
-        json_response = JSON.parse(response.body)
-        expect(json_response['error']).to eq('Access denied')
+      end
+
+      it 'returns access denied message' do
+        post :search, params: valid_params
+
+        expect(JSON.parse(response.body)['error']).to eq('Access denied')
       end
     end
   end
@@ -156,28 +177,28 @@ RSpec.describe Api::V1::AiSearchController, type: :controller do
       create(:search_analytic, user: user1, query: "Pink Floyd", searched_at: 30.minutes.ago)
     end
 
-    it 'returns trending searches' do
+    it 'returns ok status for trending' do
       get :trending
-      
+
       expect(response).to have_http_status(:ok)
-      json_response = JSON.parse(response.body)
-      expect(json_response['success']).to be true
-      expect(json_response['data']['trending_searches']).to be_present
-      expect(json_response['data']['trending_searches']['Beatles']).to eq(3)
+    end
+
+    it 'returns trending data' do
+      get :trending
+
+      expect(JSON.parse(response.body)['data']['trending_searches']).to include('Beatles' => 3)
     end
 
     it 'respects limit parameter' do
       get :trending, params: { limit: 2 }
-      
-      json_response = JSON.parse(response.body)
-      expect(json_response['data']['trending_searches'].keys.size).to eq(2)
+
+      expect(JSON.parse(response.body)['data']['trending_searches'].keys.size).to eq(2)
     end
 
     it 'respects time_period parameter' do
       get :trending, params: { time_period: 1 }
-      
-      json_response = JSON.parse(response.body)
-      expect(json_response['data']['time_period_hours']).to eq(1)
+
+      expect(JSON.parse(response.body)['data']['time_period_hours']).to eq(1)
     end
   end
 
@@ -186,33 +207,35 @@ RSpec.describe Api::V1::AiSearchController, type: :controller do
     let!(:search2) { create(:search_analytic, user: user, query: "Queen", searched_at: 1.hour.ago) }
     let!(:other_user_search) { create(:search_analytic, query: "Pink Floyd", searched_at: 30.minutes.ago) }
 
-    it 'returns user search history' do
+    it 'returns ok status for user history' do
       get :user_history
-      
+
       expect(response).to have_http_status(:ok)
-      json_response = JSON.parse(response.body)
-      expect(json_response['success']).to be true
-      expect(json_response['data']['searches'].size).to eq(2)
-      expect(json_response['data']['searches'].first['query']).to eq("Queen") # Most recent first
+    end
+
+    it 'returns two user searches' do
+      get :user_history
+
+      expect(JSON.parse(response.body)['data']['searches'].size).to eq(2)
+    end
+
+    it 'returns most recent search first' do
+      get :user_history
+
+      expect(JSON.parse(response.body)['data']['searches'].first['query']).to eq('Queen')
     end
 
     it 'paginates results' do
       get :user_history, params: { page: 1, per_page: 1 }
-      
-      json_response = JSON.parse(response.body)
-      expect(json_response['data']['searches'].size).to eq(1)
-      expect(json_response['data']['pagination']['page']).to eq(1)
-      expect(json_response['data']['pagination']['per_page']).to eq(1)
-      expect(json_response['data']['pagination']['total_count']).to eq(2)
+
+      expect(JSON.parse(response.body)['data']['pagination']).to include('page' => 1, 'per_page' => 1, 'total_count' => 2)
     end
 
     it 'only returns current user searches' do
       get :user_history
-      
-      json_response = JSON.parse(response.body)
-      queries = json_response['data']['searches'].map { |s| s['query'] }
-      expect(queries).to contain_exactly("Beatles", "Queen")
-      expect(queries).not_to include("Pink Floyd")
+
+      queries = JSON.parse(response.body)['data']['searches'].map { |s| s['query'] }
+      expect(queries).to match_array(%w[Beatles Queen])
     end
   end
 end

@@ -41,7 +41,7 @@ En la sección **Environment Variables**, agrega:
 
 #### Variables Requeridas (las tienes que configurar)
 - `RAILS_MASTER_KEY` → Copia el contenido de `config/master.key`
-- `GEMINI_API_KEY` → Tu clave de API de Google Gemini
+- `OPENAI_API_KEY` → Tu clave API de OpenAI
 - `SMTP_USERNAME` → Tu email de Gmail
 - `SMTP_PASSWORD` → Tu contraseña de aplicación de Gmail
 - `CORS_ALLOWED_ORIGINS` → URL de tu frontend en Vercel (ej: `https://soundscape-frontend.vercel.app`)
@@ -81,20 +81,20 @@ https://soundscape-api.onrender.com
 ```
 
 ### Endpoints principales:
-- Health Check: `GET /up`
-- API Base: `/api/v1/`
+- Chequeo de salud: `GET /up`
+- API base: `/api/v1/`
 - Autenticación: `/api/v1/auth/login`
 - Playlists: `/api/v1/playlists`
-- AI Search: `/api/v1/ai_search`
+- Búsqueda con IA: `/api/v1/ai_search`
 
-## 🔧 Troubleshooting
+## 🔧 Solución de Problemas
 
-### Error: "Web service failed to start"
+### Error: "El servicio web no pudo iniciar"
 1. Revisa los logs en Render Dashboard
 2. Verifica que `RAILS_MASTER_KEY` sea correcto
 3. Asegúrate de que todas las variables de entorno estén configuradas
 
-### Error: Database connection
+### Error: Conexión a la base de datos
 1. Verifica que `DATABASE_URL` esté conectada correctamente
 2. La base de datos debe estar en el mismo proyecto
 
@@ -102,7 +102,7 @@ https://soundscape-api.onrender.com
 1. Verifica que `CORS_ALLOWED_ORIGINS` contenga la URL exacta de tu frontend
 2. No agregues "/" al final de las URLs
 
-### Error: Email sending
+### Error: Envío de correo
 1. Verifica `SMTP_USERNAME` y `SMTP_PASSWORD`
 2. Asegúrate de usar una contraseña de aplicación, no tu contraseña de Gmail normal
 

@@ -41,11 +41,8 @@ gem "jwt"
 # Authorization with CanCanCan
 gem "cancancan"
 
-# AI Integration with Google Gemini
-gem "gemini-ai"
-
-# HTTP client for API requests
-gem "faraday"
+# OpenAI client
+gem "ruby-openai", require: "openai"
 
 # Redis for caching and rate limiting
 gem "redis"
