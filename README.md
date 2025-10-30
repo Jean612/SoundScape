@@ -1,60 +1,60 @@
 # SoundScape API
 
-SoundScape es una API REST construida con Ruby on Rails que permite a los usuarios gestionar listas de reproducción de música con autenticación segura, búsqueda inteligente con IA y exportación a plataformas como Spotify y YouTube Music.
+SoundScape is a REST API built with Ruby on Rails that allows users to manage music playlists with secure authentication, intelligent AI-powered search, and export capabilities to platforms like Spotify and YouTube Music.
 
-## 🎵 Características Principales
+## 🎵 Key Features
 
-- **Autenticación JWT** con confirmación de email obligatoria
-- **Gestión de Playlists** y canciones con autorización basada en roles
-- **Búsqueda Inteligente con IA** usando Google Gemini para sugerencias de canciones
-- **Sistema de Analytics** para tracking de búsquedas y tendencias
-- **Cache Inteligente** y rate limiting para optimización de rendimiento
-- **Exportación** a Spotify/YouTube Music (próximamente)
+- **JWT Authentication** with mandatory email confirmation.
+- **Playlist and Song Management** with role-based authorization.
+- **Intelligent AI Search** using Google Gemini for song suggestions.
+- **Analytics System** for tracking searches and identifying trends.
+- **Smart Caching** and rate limiting for performance optimization.
+- **Export Functionality** to Spotify/YouTube Music (coming soon).
 
-## 🛠 Tecnologías
+## 🛠 Technologies
 
 - **Ruby** 3.2.2
 - **Rails** 8.0 (API mode)
-- **PostgreSQL** como base de datos
-- **JWT** para autenticación
-- **CanCanCan** para autorización
-- **Google Gemini AI** para búsqueda inteligente
-- **RSpec** para testing
-- **RuboCop** para formateo de código
+- **PostgreSQL** as the database
+- **JWT** for authentication
+- **CanCanCan** for authorization
+- **Google Gemini AI** for intelligent search
+- **RSpec** for testing
+- **RuboCop** for code formatting
 
-## 📋 Requisitos del Sistema
+## 📋 System Requirements
 
 - Ruby 3.2.2+
 - PostgreSQL 12+
-- Redis (para cache y rate limiting)
-- Gemini API Key de Google
+- Redis (for caching and rate limiting)
+- Google Gemini API Key
 
-## ⚙️ Configuración
+## ⚙️ Configuration
 
-### 1. Instalación
+### 1. Installation
 
 ```bash
-# Clonar el repositorio
+# Clone the repository
 git clone <repository-url>
 cd SoundScape
 
-# Instalar dependencias
+# Install dependencies
 bundle install
 
-# Configurar base de datos
+# Configure the database
 rails db:create
 rails db:migrate
 ```
 
-### 2. Variables de Entorno
+### 2. Environment Variables
 
-Crear archivo `.env` basado en `.env.example`:
+Create a `.env` file based on `.env.example`:
 
 ```bash
 # Database Configuration
 DATABASE_URL=postgresql://username:password@localhost/soundscape_development
 
-# Email Configuration  
+# Email Configuration
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USERNAME=your-email@gmail.com
@@ -68,39 +68,39 @@ GEMINI_API_KEY=your-gemini-api-key-here
 REDIS_URL=redis://localhost:6379/0
 ```
 
-### 3. Obtener Gemini API Key
+### 3. Obtain a Gemini API Key
 
-1. Visita [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Crea una nueva API key
-3. Agrega la key a tu archivo `.env`
+1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey).
+2. Create a new API key.
+3. Add the key to your `.env` file.
 
-## 🚀 Uso
+## 🚀 Usage
 
-### Iniciar el servidor
+### Starting the Server
 
 ```bash
 rails server
 ```
 
-### Endpoints principales
+### Main Endpoints
 
-#### Autenticación
+#### Authentication
 
 ```bash
-# Registro
+# Registration
 POST /api/v1/auth/register
 {
   "user": {
     "email": "user@example.com",
     "password": "password123",
-    "name": "Usuario",
-    "username": "usuario123",
+    "name": "User Name",
+    "username": "username123",
     "birth_date": "1990-01-01",
-    "country": "España"
+    "country": "USA"
   }
 }
 
-# Login (requiere email confirmado)
+# Login (requires a confirmed email)
 POST /api/v1/auth/login
 {
   "user": {
@@ -109,14 +109,14 @@ POST /api/v1/auth/login
   }
 }
 
-# Confirmar email
+# Confirm Email
 GET /api/v1/auth/confirm_email?token=CONFIRMATION_TOKEN
 ```
 
-#### Búsqueda con IA
+#### AI-Powered Search
 
 ```bash
-# Buscar canciones con IA
+# Search for songs using AI
 POST /api/v1/ai_search
 Authorization: Bearer JWT_TOKEN
 {
@@ -124,31 +124,31 @@ Authorization: Bearer JWT_TOKEN
   "limit": 5
 }
 
-# Obtener búsquedas trending
+# Get trending searches
 GET /api/v1/ai_search/trending?limit=10&time_period=24
 
-# Historial de búsquedas del usuario
+# User's search history
 GET /api/v1/ai_search/history?page=1&per_page=20
 ```
 
-#### Gestión de Playlists
+#### Playlist Management
 
 ```bash
-# Crear playlist
+# Create a playlist
 POST /api/v1/playlists
 Authorization: Bearer JWT_TOKEN
 {
   "playlist": {
-    "name": "Mi Playlist",
-    "description": "Descripción opcional"
+    "name": "My Playlist",
+    "description": "Optional description"
   }
 }
 
-# Listar playlists del usuario
+# List the user's playlists
 GET /api/v1/playlists
 Authorization: Bearer JWT_TOKEN
 
-# Agregar canción a playlist
+# Add a song to a playlist
 POST /api/v1/playlists/:playlist_id/songs
 Authorization: Bearer JWT_TOKEN
 {
@@ -161,61 +161,61 @@ Authorization: Bearer JWT_TOKEN
 ## 🧪 Testing
 
 ```bash
-# Ejecutar todos los tests
+# Run all tests
 rspec
 
-# Ejecutar tests específicos
+# Run specific tests
 rspec spec/models/
 rspec spec/controllers/
 rspec spec/services/
 
-# Con detalles de cobertura
+# With coverage details
 rspec --format documentation
 ```
 
-Actualmente tenemos **107+ tests pasando** con cobertura completa de:
-- Modelos y validaciones
-- Controladores y autenticación
-- Servicios de IA y cache
-- Analytics y rate limiting
+Currently, we have **107+ passing tests** with full coverage of:
+- Models and validations
+- Controllers and authentication
+- AI and caching services
+- Analytics and rate limiting
 
-## 📊 Funcionalidades de IA
+## 📊 AI Functionalities
 
-### Búsqueda Inteligente
+### Intelligent Search
 
-El sistema utiliza **Google Gemini 1.5 Flash** para generar sugerencias inteligentes de canciones:
+The system uses **Google Gemini 1.5 Flash** to generate intelligent song suggestions:
 
-- **Cache**: Resultados cacheados por 1 hora para mejor rendimiento
-- **Rate Limiting**: 60 búsquedas por hora por usuario
-- **Validación**: Queries entre 2-100 caracteres
-- **Fallback**: Respuesta graceful cuando la IA no está disponible
+- **Caching**: Results are cached for 1 hour for improved performance.
+- **Rate Limiting**: 60 searches per hour per user.
+- **Validation**: Queries must be between 2 and 100 characters.
+- **Fallback**: Provides a graceful response when the AI service is unavailable.
 
-### Analytics y Tendencias
+### Analytics and Trends
 
-- **Tracking de búsquedas**: Registra consultas, timestamps y resultados
-- **Búsquedas trending**: Top consultas en períodos configurables
-- **Historial personal**: Búsquedas paginadas por usuario
-- **Datos anónimos**: IP addresses para analytics sin identificación personal
+- **Search Tracking**: Records queries, timestamps, and results.
+- **Trending Searches**: Identifies top queries in configurable time periods.
+- **Personal History**: Paginated search history per user.
+- **Anonymous Data**: IP addresses are used for analytics without personal identification.
 
-## 🔒 Seguridad
+## 🔒 Security
 
-- **JWT Authentication** con tokens seguros
-- **Email confirmation** obligatoria antes del acceso
-- **Rate limiting** por usuario y endpoint
-- **Authorization** basada en roles con CanCanCan
-- **Validación** exhaustiva de inputs
-- **Logs seguros** sin exposición de datos sensibles
+- **JWT Authentication** with secure tokens.
+- **Mandatory Email Confirmation** before access is granted.
+- **Rate Limiting** per user and endpoint.
+- **Role-Based Authorization** with CanCanCan.
+- **Exhaustive Input Validation**.
+- **Secure Logs** with no exposure of sensitive data.
 
 ## 🚀 Deployment
 
-### Producción
+### Production
 
-1. Configurar variables de entorno en el servidor
-2. Ejecutar migraciones: `rails db:migrate RAILS_ENV=production`
-3. Compilar assets: `rails assets:precompile RAILS_ENV=production`
-4. Iniciar servidor: `rails server -e production`
+1. Configure environment variables on the server.
+2. Run migrations: `rails db:migrate RAILS_ENV=production`
+3. Precompile assets: `rails assets:precompile RAILS_ENV=production`
+4. Start the server: `rails server -e production`
 
-### Docker (próximamente)
+### Docker (coming soon)
 
 ```bash
 docker-compose up -d
@@ -223,26 +223,26 @@ docker-compose up -d
 
 ## 📈 Roadmap
 
-- [ ] Integración con Spotify API
-- [ ] Integración con YouTube Music API
-- [ ] Sistema de recomendaciones personalizado
-- [ ] Compartir playlists entre usuarios
-- [ ] API de exportación masiva
-- [ ] Dashboard de analytics
+- [ ] Spotify API Integration
+- [ ] YouTube Music API Integration
+- [ ] Personalized Recommendation System
+- [ ] Share playlists between users
+- [ ] Bulk Export API
+- [ ] Analytics Dashboard
 - [ ] Mobile SDK
 
-## 🤝 Contribución
+## 🤝 Contribution
 
-1. Fork el proyecto
-2. Crear branch de feature (`git checkout -b feature/nueva-feature`)
-3. Commit cambios (`git commit -am 'Agregar nueva feature'`)
-4. Push al branch (`git push origin feature/nueva-feature`)
-5. Crear Pull Request
+1. Fork the project.
+2. Create a feature branch (`git checkout -b feature/new-feature`).
+3. Commit your changes (`git commit -am 'Add new feature'`).
+4. Push to the branch (`git push origin feature/new-feature`).
+5. Create a Pull Request.
 
 ## 📝 License
 
-Este proyecto está bajo la licencia MIT. Ver `LICENSE` para más detalles.
+This project is licensed under the MIT License. See `LICENSE` for more details.
 
-## 🆘 Soporte
+## 🆘 Support
 
-Para reportar bugs o solicitar features, crear un issue en GitHub o contactar al equipo de desarrollo.
+To report bugs or request features, please create an issue on GitHub or contact the development team.

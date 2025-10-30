@@ -1,3 +1,5 @@
+# Handles AI-powered song searches using the Google Gemini API.
+# This service includes caching, rate limiting, and analytics tracking.
 class AiSearchService
   include ActiveModel::Model
   include ActiveModel::Attributes
@@ -10,12 +12,21 @@ class AiSearchService
   RATE_LIMIT_REQUESTS = 60
   RATE_LIMIT_WINDOW = 1.hour
 
+  # Initializes the service and validates the presence of the Gemini API key.
+  #
+  # @param attributes [Hash] The attributes to initialize the service with.
+  # @raise [StandardError] If the GEMINI_API_KEY is not configured.
   def initialize(attributes = {})
     super
-    @api_key = ENV["GEMINI_API_KEY"]
-    raise StandardError, "GEMINI_API_KEY not configured" if @api_key.blank?
+    @api_key = ENV['GEMINI_API_KEY']
+    raise StandardError, 'GEMINI_API_KEY not configured' if @api_key.blank?
   end
 
+  # Performs a song search.
+  # It checks for rate limiting, validates the query, and attempts to fetch results from the cache.
+  # If no cached results are found, it queries the Gemini API.
+  #
+  # @return [Hash] A hash containing the search results or an error message.
   def search_songs
     return rate_limit_error unless within_rate_limit?
     return validation_error unless valid_query?
@@ -44,6 +55,9 @@ class AiSearchService
 
   private
 
+  # Validates the search query.
+  #
+  # @return [Boolean] True if the query is valid, false otherwise.
   def valid_query?
     query.present? && query.length >= 2 && query.length <= 100
   end

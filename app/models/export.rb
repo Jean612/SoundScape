@@ -15,6 +15,7 @@
 #  index_exports_on_playlist_id  (playlist_id)
 #
 
+# Represents an export of a playlist to an external platform like Spotify or YouTube Music.
 class Export < ApplicationRecord
   belongs_to :playlist
 

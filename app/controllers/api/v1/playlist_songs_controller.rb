@@ -1,30 +1,34 @@
+# Manages adding and removing songs from a playlist.
 class Api::V1::PlaylistSongsController < ApplicationController
   before_action :set_playlist
   before_action :set_playlist_song, only: [ :destroy ]
 
+  # Adds a song to a playlist.
+  #
+  # @param playlist_id [Integer] The ID of the playlist.
+  # @param song_id [Integer] The ID of the song to add.
+  # @return [JSON] A JSON response indicating the result of the operation.
   def create
     begin
       @song = Song.find(params[:song_id])
     rescue ActiveRecord::RecordNotFound
-      return render json: { error: "Song not found" }, status: :not_found
-    end
-    
-    # Check if song already exists in playlist
-    existing = @playlist.playlist_songs.find_by(song: @song)
-    if existing
-      return render json: { error: "Song already in playlist" }, status: :conflict
+      return render json: { error: 'Song not found' }, status: :not_found
     end
 
-    # Get next position
+    existing = @playlist.playlist_songs.find_by(song: @song)
+    if existing
+      return render json: { error: 'Song already in playlist' }, status: :conflict
+    end
+
     next_position = @playlist.playlist_songs.maximum(:position).to_i + 1
-    
+
     @playlist_song = @playlist.playlist_songs.build(
       song: @song,
       position: next_position
     )
-    
+
     authorize! :create, @playlist_song
-    
+
     if @playlist_song.save
       render json: {
         message: 'Song added to playlist',
@@ -39,31 +43,45 @@ class Api::V1::PlaylistSongsController < ApplicationController
     end
   end
 
+  # Removes a song from a playlist and reorders the remaining songs.
+  #
+  # @param playlist_id [Integer] The ID of the playlist.
+  # @param id [Integer] The ID of the playlist_song record to remove.
+  # @return [JSON] A JSON response indicating the song has been removed.
   def destroy
     authorize! :destroy, @playlist_song
     @playlist_song.destroy
-    
-    # Reorder remaining songs
-    @playlist.playlist_songs.where("position > ?", @playlist_song.position)
-             .update_all("position = position - 1")
-    
-    render json: { message: "Song removed from playlist" }
+
+    @playlist.playlist_songs.where('position > ?', @playlist_song.position)
+             .update_all('position = position - 1')
+
+    render json: { message: 'Song removed from playlist' }
   end
 
   private
 
+  # Finds the playlist based on the playlist_id parameter.
+  #
+  # @return [void]
   def set_playlist
     @playlist = Playlist.find(params[:playlist_id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: 'Playlist not found' }, status: :not_found
   end
 
+  # Finds the playlist_song record based on the ID parameter.
+  #
+  # @return [void]
   def set_playlist_song
     @playlist_song = @playlist.playlist_songs.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: 'Song not found in playlist' }, status: :not_found
   end
 
+  # Formats the song data for a JSON response.
+  #
+  # @param song [Song] The song to format.
+  # @return [Hash] A hash containing the song's data.
   def song_response(song)
     {
       id: song.id,
