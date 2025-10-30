@@ -13,6 +13,7 @@
 #  updated_at       :datetime         not null
 #
 
+# Represents a song in the music library.
 class Song < ApplicationRecord
   has_many :playlist_songs, dependent: :destroy
   has_many :playlists, through: :playlist_songs

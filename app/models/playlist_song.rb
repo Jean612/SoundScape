@@ -15,6 +15,7 @@
 #  index_playlist_songs_on_song_id      (song_id)
 #
 
+# Represents the join table between playlists and songs, indicating a song's position in a playlist.
 class PlaylistSong < ApplicationRecord
   belongs_to :playlist
   belongs_to :song

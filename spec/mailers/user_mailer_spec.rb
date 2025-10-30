@@ -14,8 +14,8 @@ RSpec.describe UserMailer, type: :mailer do
     it "renders the body" do
       expect(mail.body.encoded).to match("Hi John Doe")
       expect(mail.body.encoded).to match("Welcome to SoundScape")
-      expect(mail.body.encoded).to match("confirm your email address")
-      expect(mail.body.encoded).to match(user.email_confirmation_token)
+      expect(mail.body.encoded).to match("verification code")
+      expect(mail.body.encoded).to match(user.otp_code)
     end
   end
 end

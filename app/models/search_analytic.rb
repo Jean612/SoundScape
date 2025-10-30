@@ -16,6 +16,7 @@
 #  index_search_analytics_on_user_id  (user_id)
 #
 
+# Records search queries made by users for analytics purposes.
 class SearchAnalytic < ApplicationRecord
   belongs_to :user
 
@@ -26,6 +27,11 @@ class SearchAnalytic < ApplicationRecord
   scope :by_user, ->(user_id) { where(user_id: user_id) }
   scope :popular_queries, -> { group(:query).count.sort_by(&:last).reverse.to_h }
 
+  # Returns the most frequent search queries within a given time period.
+  #
+  # @param limit [Integer] The maximum number of trending searches to return.
+  # @param time_period [ActiveSupport::Duration] The time window to consider for trending searches.
+  # @return [Hash] A hash of trending queries and their counts.
   def self.trending_searches(limit: 10, time_period: 24.hours)
     where(searched_at: time_period.ago..Time.current)
       .group(:query)

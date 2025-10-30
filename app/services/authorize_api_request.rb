@@ -1,8 +1,16 @@
+# A service object to authorize API requests.
+# It validates the JWT token from the request headers and returns the authenticated user.
 class AuthorizeApiRequest
+  # Initializes the service with the request headers.
+  #
+  # @param headers [Hash] The request headers, including the 'Authorization' header.
   def initialize(headers = {})
     @headers = headers
   end
 
+  # The main entry point for the service.
+  #
+  # @return [Hash] A hash containing the authenticated user.
   def call
     {
       user: user

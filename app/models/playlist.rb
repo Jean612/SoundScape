@@ -14,6 +14,7 @@
 #  index_playlists_on_user_id  (user_id)
 #
 
+# Represents a user-created playlist containing a collection of songs.
 class Playlist < ApplicationRecord
   belongs_to :user
   has_many :playlist_songs, dependent: :destroy
